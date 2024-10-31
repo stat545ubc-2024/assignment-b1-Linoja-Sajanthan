@@ -1,0 +1,106 @@
+---
+title: "Assignment B1"
+author: "Linoja"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+#### Exercise 1: Make a Function & Exercise 2: Document your Function
+```{r}
+# Function to extract unique values from a specified column in a data frame
+#' Title
+#'
+#' @param data 
+#' @param column 
+#'
+#' @return
+#' @export
+#'
+#' @examples
+extract_unique_values <- function(data, column) {
+  # Check if the data is a data frame
+  if (!is.data.frame(data)) {
+    stop("The input data must be a data frame.")
+  }
+  
+  # Check if the specified column exists in the data frame
+  if (!column %in% colnames(data)) {
+    stop(paste("Column", column, "does not exist in the data frame."))
+  }
+  
+  # Extract and return unique values from the specified column
+  unique_values <- unique(data[[column]])
+  return(unique_values)
+}
+```
+
+
+#### Exercise 3: Include examples #####
+```{r}
+# Load necessary libraries of dataset
+library(gapminder)
+library(palmerpenguins)
+
+# Test the extract_unique_values function with the gapminder dataset
+## Example 1: Extract unique continents from the gapminder dataset
+unique_continents_gapminder <- extract_unique_values(gapminder, "continent")
+print("Unique continents in gapminder dataset:")
+print(unique_continents_gapminder)
+
+## Example 2: Extract unique countries from the gapminder dataset
+unique_countries_gapminder <- extract_unique_values(gapminder, "country")
+print("Unique countries in gapminder dataset:")
+print(unique_countries_gapminder)
+
+# Test the extract_unique_values function with the penguins dataset
+## Example 3: Extract unique species from the penguins dataset
+unique_species_penguins <- extract_unique_values(penguins, "species")
+print("Unique species in penguins dataset:")
+print(unique_species_penguins)
+
+## Example 4: Extract unique islands from the penguins dataset
+unique_islands_penguins <- extract_unique_values(penguins, "island")
+print("Unique islands in penguins dataset:")
+print(unique_islands_penguins)
+
+## Example 5: Try to extract unique values from a non-existent column
+tryCatch({
+  unique_errors <- extract_unique_values(gapminder, "non_existent_column")
+  print(unique_errors)
+}, error = function(e) {
+  cat("Caught an error:\n")
+  print(e$message)
+})
+```
+
+#### Exercise 4: Test the Function ####
+```{r}
+
+# Load the library
+library(testthat)
+
+# Test cases for extract_unique_values() function
+test_that("Extract unique values function works as expected", {
+
+  # 1. Test with a simple data frame containing unique values
+  df1 <- data.frame(name = c("apple", "banana", "apple", "cherry"))
+  expect_equal(extract_unique_values(df1, "name"), c("apple", "banana", "cherry"))
+
+  # 2. Test with a data frame containing NA values
+  df2 <- data.frame(category = c("A", "B", "A", NA, "C", NA))
+  expect_equal(extract_unique_values(df2, "category"), c("A", "B", NA, "C"))
+
+  # 3. Test with an empty data frame (column exists but is empty)
+  df3 <- data.frame(number = numeric(0))
+  expect_equal(extract_unique_values(df3, "number"), numeric(0))
+
+  # 4. Test with a numeric column containing repeated values
+  df4 <- data.frame(values = c(1, 1, 2, 3, 2, 4, 4, 4))
+  expect_equal(extract_unique_values(df4, "values"), c(1, 2, 3, 4))
+
+  # 5. Test with an invalid column name (should throw an error)
+  expect_error(extract_unique_values(df4, "nonexistent_column"))
+
+})
+
+```
